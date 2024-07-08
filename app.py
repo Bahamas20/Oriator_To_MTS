@@ -51,10 +51,11 @@ if stories:
     for story, images in stories.items():
         st.header(story)
         if st.button("View PDF", key=f"view_pdf_{story}"):
-            if len(images) != 12:
+            path = f"pdf\\{story}.pdf"
+            if not os.path.isfile(path):
                 st.warning("Wait for all images to be generated!")
             else:
-                subprocess.run(["open", f"pdf\\{story}.pdf"])
+                subprocess.Popen([path], shell=True)
         with st.container():
             cols = st.columns(NUM_IMAGES)
             for col, image_path in zip(cols, images):
