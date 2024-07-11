@@ -43,7 +43,11 @@ if st.button("Generate images"):
 
 # ---- Generate PDF button ----
 if st.button("Create PDF"):
-    subprocess.call("python scripts\\create_json.py && python scripts\\create_pdf.py", shell=True)
+    venv_activate = ".venv\\Scripts\\python.exe"
+    scripts = ["scripts\\create_json.py", "scripts\\create_pdf.py"]
+    
+    for script in scripts:
+        subprocess.run([venv_activate, script], check=True)
 
 # ---- Display stories ---- 
 stories = get_images_from_directory(STORIES_DIRECTORY)

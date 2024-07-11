@@ -310,24 +310,11 @@ def create_new_pdf(template_pdf_path, path_to_config):
                     OFFSET = 20 if page_num == 29 or page_num == 33 else 0
                     rect = fitz.Rect(x0, y0 + OFFSET, x1, y1 + OFFSET)
 
-
-                    new_page_obj.insert_text(rect, text, fontsize, fontfile, fontcolor, align)
+                    new_page_obj.insert_text(rect, text, fontsize, fontfile,
+                                             fontcolor, align)
                     i += 1
 
     new_pdf.save_pdf(f"..\\pdf\\{data['story_name']}.pdf") 
-
-"""
-def extract_pdf_info(template_pdf_path):
-    mappings = {}
-    template_pdf = CustomPDF(template_pdf_path)
-    page_count = template_pdf.get_num_pages()
-
-    for page_num in range(page_count):
-        template_page = template_pdf_path.get_page(page_num)
-        template_page_obj = Page(template_page)
-        
-        for key in mappings.keys():
-"""
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
