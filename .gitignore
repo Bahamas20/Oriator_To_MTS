@@ -10,3 +10,6 @@ templates/*
 pdf/*
 !pdf/.gitkeep
 .DS_Store
+
+scripts/hamas/template_utils.py
+scripts/hamas/page_utils.py
