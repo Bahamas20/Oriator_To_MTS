@@ -2,7 +2,8 @@ import os
 import re
 import tempfile
 import fitz
-from PIL import Image
+import math
+from PIL import Image, ImageDraw, ImageFont
 
 class Page:
 
@@ -50,8 +51,9 @@ class Page:
                         line_height = font_size * 1.2 
                         color_value = self.get_color(span.get("color", None))
                         width = (bbox[2] - bbox[0]) + 5
-                        top = bbox[1] 
+                        top = bbox[1]
                         left = bbox[0]
+                        center_y = (bbox[1] + bbox[3]) / 2
 
                         text_box_info = {
                             "bbox": bbox,
@@ -64,7 +66,8 @@ class Page:
                             "text_color": color_value,
                             "width": int(width),
                             "top": int(top),
-                            "left": int(left)
+                            "left": int(left),
+                            "center": int(center_y)
                         }
                         text_boxes_info.append(text_box_info)
 
@@ -85,12 +88,40 @@ class Page:
             pattern = re.compile(rf"Page {base_page_number}:\n(.+?)(?=\n\nPage \d+:|\Z)", re.DOTALL)
             match = pattern.search(text_json)
             if match:
-                text_box_list[0]['text'] = match.group(1).strip()
+                text_box_list[0]['text'] = match.group(1).strip() 
+                # Assuming text_box_list[0] contains 'font_size' and 'font_path'
+                font_size = text_box_list[0].get('font_size')  # Default to 12 if not found
+                font = text_box_list[0].get('font')  # Default font path
+                font_path = f'fonts/{font}'
+                line_height = text_box_list[0].get('line_height')
+                bbox_width = text_box_list[0].get('width')
+
+                # Calculate the width of the text
+                text = text_box_list[0]['text']
+                total_text_width = self.calculate_text_width(text, font_path, font_size)
+
+                # Calculate the number of lines
+     
+                num_lines = int(math.ceil(total_text_width / bbox_width))  # Round up to nearest whole number
+                total_height = num_lines * line_height
+                center = text_box_list[0]['center']
+                new_top = center - (total_height / 2)
+
+                # Adjust the bbox
+                text_box_list[0]['top'] = int(new_top)
+
                 return text_box_list
         else:
                 return text_box_list
-
-
+    
+    def calculate_text_width(self,text, font_path, font_size):
+        font = ImageFont.truetype(font_path, font_size)
+        dummy_image = Image.new('RGB', (1, 1))
+        draw = ImageDraw.Draw(dummy_image)
+        # Use textbbox to get the bounding box of the text
+        bbox = draw.textbbox((0, 0), text, font=font)
+        return bbox[2] - bbox[0]  # Width of the text
+        
     def get_font(self,font):
         if font == 'SueEllenFrancisco':
             return 'Sue Ellen Francisco.ttf'

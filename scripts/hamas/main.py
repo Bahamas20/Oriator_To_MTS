@@ -21,8 +21,8 @@ def main(pdf_file,json_data_path,images_path):
         # creates a new story template and gets the template id
         template_json = generate_template_json(json_data,theme_id,is_trending,price,gender)
 
-        # story_id = post_template_request(template_json)
-        story_id = '650182c6-a1fd-d74e-ff1e-3a13b1fdcff7'
+        story_id = post_template_request(template_json)
+        # story_id = '117522f5-da80-fbbe-f93b-3a13b85405b5'
         time.sleep(2)
         character_name = template_json['OriginalCharacterName']
         title = template_json['Title']
@@ -40,6 +40,7 @@ def main(pdf_file,json_data_path,images_path):
                 current_page = Page(page,page_number,json_data,title,images_path)
             
             files = current_page.get_background_img()
+            print(f"Page number {page_number}")
             page_json = generate_page_json(current_page,character_name,story_id)
             post_page_request(page_json,files)
 
