@@ -81,6 +81,30 @@ class Page:
         page_number = self.page_number
         if page_number == 0 or page_number == -1:
             text_box_list[0]['text'] = self.text
+            if page_number == -1:
+                
+                font_size = text_box_list[0].get('font_size')  # Default to 12 if not found
+                font = text_box_list[0].get('font')  # Default font path
+                font_path = f'fonts/{font}'
+                line_height = text_box_list[0].get('line_height')
+                bbox_width = text_box_list[0].get('width')
+
+                # Calculate the width of the text
+                text = text_box_list[0]['text']
+                total_text_width = self.calculate_text_width(text, font_path, font_size)
+
+                # Calculate the number of lines
+     
+                num_lines = int(math.ceil(total_text_width / bbox_width))  # Round up to nearest whole number
+                total_height = num_lines * line_height
+                center = text_box_list[0]['center']
+                new_top = center - (total_height / 2)
+
+                # Adjust the bbox
+                text_box_list[0]['top'] = int(new_top)
+
+                return text_box_list
+
             return text_box_list
 
         elif page_number % 2 != 0 and 5 <= page_number <= 27:
