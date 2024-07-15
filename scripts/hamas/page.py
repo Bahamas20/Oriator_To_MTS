@@ -50,10 +50,11 @@ class Page:
                         text_align = 'center'
                         line_height = font_size * 1.2 
                         color_value = self.get_color(span.get("color", None))
-                        width = (bbox[2] - bbox[0]) + 5
+                        width = (bbox[2] - bbox[0]) + 10
                         top = bbox[1]
                         left = bbox[0]
                         center_y = (bbox[1] + bbox[3]) / 2
+
 
                         text_box_info = {
                             "bbox": bbox,
@@ -81,30 +82,6 @@ class Page:
         page_number = self.page_number
         if page_number == 0 or page_number == -1:
             text_box_list[0]['text'] = self.text
-            if page_number == -1:
-                
-                font_size = text_box_list[0].get('font_size')  # Default to 12 if not found
-                font = text_box_list[0].get('font')  # Default font path
-                font_path = f'fonts/{font}'
-                line_height = text_box_list[0].get('line_height')
-                bbox_width = text_box_list[0].get('width')
-
-                # Calculate the width of the text
-                text = text_box_list[0]['text']
-                total_text_width = self.calculate_text_width(text, font_path, font_size)
-
-                # Calculate the number of lines
-     
-                num_lines = int(math.ceil(total_text_width / bbox_width))  # Round up to nearest whole number
-                total_height = num_lines * line_height
-                center = text_box_list[0]['center']
-                new_top = center - (total_height / 2)
-
-                # Adjust the bbox
-                text_box_list[0]['top'] = int(new_top)
-
-                return text_box_list
-
             return text_box_list
 
         elif page_number % 2 != 0 and 5 <= page_number <= 27:
@@ -113,31 +90,38 @@ class Page:
             match = pattern.search(text_json)
             if match:
                 text_box_list[0]['text'] = match.group(1).strip() 
-                # Assuming text_box_list[0] contains 'font_size' and 'font_path'
-                font_size = text_box_list[0].get('font_size')  # Default to 12 if not found
-                font = text_box_list[0].get('font')  # Default font path
-                font_path = f'fonts/{font}'
-                line_height = text_box_list[0].get('line_height')
-                bbox_width = text_box_list[0].get('width')
-
-                # Calculate the width of the text
-                text = text_box_list[0]['text']
-                total_text_width = self.calculate_text_width(text, font_path, font_size)
-
-                # Calculate the number of lines
-     
-                num_lines = int(math.ceil(total_text_width / bbox_width))  # Round up to nearest whole number
-                total_height = num_lines * line_height
-                center = text_box_list[0]['center']
-                new_top = center - (total_height / 2)
-
-                # Adjust the bbox
-                text_box_list[0]['top'] = int(new_top)
-
                 return text_box_list
         else:
                 return text_box_list
-    
+        
+    def position_text(self,text_box_list):
+        if self.contains_text():
+            for i in range(len(text_box_list)):
+                font_size = text_box_list[i].get('font_size')  # Default to 12 if not found
+                font = text_box_list[i].get('font')  # Default font path
+                font_path = f'fonts/{font}'
+                line_height = text_box_list[i].get('line_height')
+                bbox_width = text_box_list[i].get('width')
+
+                # Calculate the width of the text
+                text = text_box_list[i]['text']
+                total_text_width = self.calculate_text_width(text, font_path, font_size)
+
+
+                # Calculate the number of lines
+        
+                num_lines = int(math.ceil(total_text_width / bbox_width))  # Round up to nearest whole number
+                total_height = num_lines * line_height
+                center = text_box_list[i]['center']
+                new_top = center - (total_height / 2)
+
+                # Adjust the bbox
+                text_box_list[i]['top'] = int(new_top)
+
+            return text_box_list
+        else:
+            return text_box_list
+
     def calculate_text_width(self,text, font_path, font_size):
         font = ImageFont.truetype(font_path, font_size)
         dummy_image = Image.new('RGB', (1, 1))

@@ -22,7 +22,7 @@ def main(pdf_file,json_data_path,images_path):
         template_json = generate_template_json(json_data,theme_id,is_trending,price,gender)
 
         story_id = post_template_request(template_json)
-        # story_id = '117522f5-da80-fbbe-f93b-3a13b85405b5'
+        # story_id = 'e0583031-0bb3-c540-d02b-3a13c67449db'
         time.sleep(2)
         character_name = template_json['OriginalCharacterName']
         title = template_json['Title']
