@@ -86,8 +86,9 @@ class Page:
 
         elif page_number % 2 != 0 and 5 <= page_number <= 27:
             base_page_number = (page_number - 5) // 2 + 1
-            pattern = re.compile(rf"Page {base_page_number}:\n(.+?)(?=\n\nPage \d+:|\Z)", re.DOTALL)
+            pattern = re.compile(rf"(?:Page {base_page_number}.*?\n)(.+?[.!?])", re.DOTALL) 
             match = pattern.search(text_json)
+            print(match.group(1).strip() )
             if match:
                 text_box_list[0]['text'] = match.group(1).strip() 
                 return text_box_list

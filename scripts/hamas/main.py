@@ -1,4 +1,5 @@
 import json
+import os
 import time
 import fitz
 from template_utils import generate_template_json,post_template_request
@@ -21,12 +22,14 @@ def main(pdf_file,json_data_path,images_path):
         # creates a new story template and gets the template id
         template_json = generate_template_json(json_data,theme_id,is_trending,price,gender)
 
-        story_id = post_template_request(template_json)
-        # story_id = 'e0583031-0bb3-c540-d02b-3a13c67449db'
+        # story_id = post_template_request(template_json)
+        story_id = 'e0583031-0bb3-c540-d02b-3a13c67449db'
         time.sleep(2)
         character_name = template_json['OriginalCharacterName']
-        title = template_json['Title']
-        description = template_json['Description']
+        # title = template_json['Title']
+        title = os.path.basename(json_data_path)  # Extract the file name from path
+        title = os.path.splitext(title)[0]  # Remove the file extension
+        description = template_json['Description']        
      
         # # Calling API for add-new-page for each page
         for page_number in range(len(file)):
@@ -42,13 +45,13 @@ def main(pdf_file,json_data_path,images_path):
             files = current_page.get_background_img()
             print(f"Page number {page_number}")
             page_json = generate_page_json(current_page,character_name,story_id)
-            post_page_request(page_json,files)
+            # post_page_request(page_json,files,page_number)
 
     except Exception as e:
         print(f"An error occured: {e}")
 
 if __name__ == "__main__":
     pdf_file = 'scripts/hamas/sample.pdf'
-    json_data_path = 'stories/toy/Jeremy loses and finds his Teddy.json'
-    images_path = 'stories/toy/images'
+    json_data_path = 'stories/sample/Jeremy and the Dark Forest.json'
+    images_path = 'stories/sample/images'
     main(pdf_file,json_data_path,images_path)
