@@ -13,3 +13,5 @@ pdf/*
 
 scripts/hamas/template_utils.py
 scripts/hamas/page_utils.py
+*.json
+*.zip

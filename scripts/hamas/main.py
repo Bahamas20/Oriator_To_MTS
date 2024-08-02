@@ -1,57 +1,28 @@
-import json
-import os
-import time
-import fitz
-from template_utils import generate_template_json,post_template_request
-from page_utils import generate_page_json,post_page_request
-from page import Page
+from template_utils import post_template_request
+from page_utils import post_page_request
+from json_utils import create_json,input_json
 
-
-def main(pdf_file,json_data_path,images_path):
+def main(json_list, image_list):
     try:
-        file = fitz.open(pdf_file)   
-
-        # Calling API for create-new-storytemplate
-        json_file = open(json_data_path)
-        json_data = json.load(json_file)
-        theme_id = "5b76955b-edbd-925c-3281-3a11a710a1b2" # theme id for resillience
-        is_trending = False
-        price = 5
-        gender = 0
-
-        # creates a new story template and gets the template id
-        template_json = generate_template_json(json_data,theme_id,is_trending,price,gender)
-
-        # story_id = post_template_request(template_json)
-        story_id = 'e0583031-0bb3-c540-d02b-3a13c67449db'
-        time.sleep(2)
-        character_name = template_json['OriginalCharacterName']
-        # title = template_json['Title']
-        title = os.path.basename(json_data_path)  # Extract the file name from path
-        title = os.path.splitext(title)[0]  # Remove the file extension
-        description = template_json['Description']        
-     
-        # # Calling API for add-new-page for each page
-        for page_number in range(len(file)):
-            
-            page = file.load_page(page_number)
-            
-            if page_number == len(file) - 1:
-                current_page = Page(page,-1,json_data,description,images_path)
-            
+        StoryTemplateId = ''
+        for i in range(json_list):
+            if i == 0:
+                payload = json_list[i]
+                # StoryTemplateId = post_template_request(payload)
+                StoryTemplateID = "6755ae44-75c9-2b1a-a144-3a141a3095d9"
             else:
-                current_page = Page(page,page_number,json_data,title,images_path)
-            
-            files = current_page.get_background_img()
-            print(f"Page number {page_number}")
-            page_json = generate_page_json(current_page,character_name,story_id)
-            # post_page_request(page_json,files,page_number)
+                payload = json_list[i]
+                payload['StoryTemplateId'] = StoryTemplateId
+                files = image_list[i]
+                post_page_request(payload,files)
+
 
     except Exception as e:
         print(f"An error occured: {e}")
 
 if __name__ == "__main__":
-    pdf_file = 'scripts/hamas/sample.pdf'
-    json_data_path = 'stories/sample/Jeremy and the Dark Forest.json'
-    images_path = 'stories/sample/images'
-    main(pdf_file,json_data_path,images_path)
+    pdf_file = '/Users/mohamedhamas/Desktop/Work/Oriator_To_MTS/templates/updated_pdf.pdf'
+    json_list = create_json(pdf_file,5,0)
+    # json_data_path = 'stories/sample/Jeremy and the Dark Forest.json'
+    # json_list, image_list = input_json(json_list,json_data_path)
+    # main(json_list,image_list)

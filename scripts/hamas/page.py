@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 class Page:
 
-    def __init__(self,page,page_number,json_data,text,images_path):
+    def __init__(self,page,page_number,json_data=None,text=None,images_path=None):
         self.page = page
         self.page_number = page_number
         self.json_data = json_data
@@ -26,7 +26,7 @@ class Page:
         return int(self.page.rect.width)
 
     def get_page_height(self):
-        return int(self.page.rect.height)  
+        return int(self.page.rect.height)
     
     def get_text_boxes_info(self):
         """
@@ -50,7 +50,7 @@ class Page:
                         text_align = 'center'
                         line_height = font_size * 1.2 
                         color_value = self.get_color(span.get("color", None))
-                        width = (bbox[2] - bbox[0]) + 10
+                        width = (bbox[2] - bbox[0]) + 5
                         top = bbox[1]
                         left = bbox[0]
                         center_y = (bbox[1] + bbox[3]) / 2
@@ -84,7 +84,7 @@ class Page:
             text_box_list[0]['text'] = self.text
             return text_box_list
 
-        elif page_number % 2 != 0 and 5 <= page_number <= 27:
+        if page_number % 2 != 0 and 5 <= page_number <= 27:
             base_page_number = (page_number - 5) // 2 + 1
             pattern = re.compile(rf"(?:Page {base_page_number}.*?\n)(.+?[.!?])", re.DOTALL) 
             match = pattern.search(text_json)
@@ -135,7 +135,7 @@ class Page:
         if font == 'SueEllenFrancisco':
             return 'Sue Ellen Francisco.ttf'
         elif font == 'LettersforLearners':
-            return 'Letters for Learners.ttf'
+            return 'Letters For Learners.ttf'
         else:
             return None
     
@@ -176,7 +176,22 @@ class Page:
                     }
         
                     return files
+        elif image_list and (page_number == 0 or page_number == -1):
 
+                if page_number == 0:
+                    text = 'FRONT'
+                else:
+                    text = 'BACK'
+
+                background_image_path = f'{self.images_path}/@{text}.png'
+                resized_image_path = self.resize_image(background_image_path, (resized_width, resized_height))
+
+                files = {
+                        'Image': ('norm_image_{}.png'.format(page_number), open(resized_image_path, 'rb'), 'image/png'),
+                        'LowResImage': ('low_res_{}.jpeg'.format(page_number), open(resized_image_path, 'rb'), 'image/jpeg')
+                }
+                    
+                return files
         else:
             try:
                 # Create a blank white image 
